@@ -4,6 +4,7 @@ from antlr4.TokenStreamRewriter import TokenStreamRewriter
 from JavaParser import JavaParser
 from JavaLexer import JavaLexer
 from JavaParserListener import JavaParserListener
+from termcolor import colored, cprint
 
 import sys
 
@@ -31,6 +32,9 @@ class AddFieldConstructorListener(JavaParserListener):
                 key, val = line.partition("=")[::2]
                 self.snippet[key.strip()] = val
 
+        print(colored("snippet to inject:", "white", "on_blue"), end="\n")      
+        print(colored(f"{self.snippet}", "white", "on_blue"), end="\n\n")
+
 def __parse(code):
     lexer = JavaLexer(antlr4.InputStream(code))
     tokens = antlr4.CommonTokenStream(lexer)
@@ -41,7 +45,7 @@ def main(args):
     file = args[1]
     code = open(file, 'r').read()
     print("====================Code====================", end="\n")
-    print(code, end="\n")
+    print(colored(f"{code}", "blue", "on_white"), end="\n")      
     print("============================================", end="\n\n")
 
     print("                     ||                     ", end="\n")
@@ -56,7 +60,7 @@ def main(args):
     newcode = listener.rewriter.getDefaultText()
 
     print("==============Transformed Code==============", end="\n")
-    print(newcode, end="\n")
+    print(colored(f"{newcode}", "blue", "on_white"), end="\n")      
     print("============================================", end="\n\n")
 
     __parse(newcode)
