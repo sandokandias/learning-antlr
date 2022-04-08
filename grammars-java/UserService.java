@@ -4,6 +4,6 @@ public class UserService {
     }
 
     public void save(User user) {
-        System.out.println("Saving user " + user)
+        System.out.println("Saving user " + user);
     }
 }
