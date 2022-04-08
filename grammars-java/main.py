@@ -59,7 +59,6 @@ def main(args):
     print(newcode, end="\n")
     print("============================================", end="\n\n")
 
-    print("Try parsing new code...", end="\n")
     __parse(newcode)
 
     
