@@ -1,9 +1,9 @@
 import antlr4
 from antlr4 import *
 from antlr4.TokenStreamRewriter import TokenStreamRewriter
-from JavaParser import JavaParser
-from JavaLexer import JavaLexer
-from JavaParserListener import JavaParserListener
+from javagrammar.JavaParser import JavaParser
+from javagrammar.JavaLexer import JavaLexer
+from javagrammar.JavaParserListener import JavaParserListener
 from termcolor import colored
 
 import sys
