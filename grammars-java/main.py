@@ -25,9 +25,9 @@ class AddFieldConstructorListener(JavaParserListener):
         att = constructor[1] + "\n"
         self.rewriter.insertAfter(ctx.start.tokenIndex + 1, param)
         self.rewriter.insertAfter(ctx.stop.tokenIndex - 1, att)
-
+        
     def __load_snippet(self):
-        with open("java.code") as code:
+        with open("./sample-app/java.code") as code:
             for line in code:
                 key, val = line.partition("=")[::2]
                 self.snippet[key.strip()] = val
@@ -40,7 +40,7 @@ def __parse(code):
     return tokens, parser.compilationUnit()
                 
 def main(args):
-    code = open("UserService.java", "r").read()
+    code = open("./sample-app/UserService.java", "r").read()
 
     print(colored(f"{code}", "white"), end="\n")      
     print("                     ||                     ", end="\n")

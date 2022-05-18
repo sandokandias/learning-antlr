@@ -1,0 +1,2 @@
+field=private final UserRepo repo;
+constructor=UserRepo repo|this.repo = repo;
