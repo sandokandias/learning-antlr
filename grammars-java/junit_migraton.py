@@ -11,11 +11,11 @@ class JunitMigrationListener(JavaParserListener):
     def __init__(self, rewriter: TokenStreamRewriter):
         self.rewriter = rewriter
         self.annotations = {
-            "@Before": "BeforeEach",
-            "@After": "AfterEach",
-            "@BeforeClass": "BeforeAll",
-            "@AfterClass": "AfterAll",
-            "@Ignore": "Disable",
+            "@Before": "@BeforeEach",
+            "@After": "@AfterEach",
+            "@BeforeClass": "@BeforeAll",
+            "@AfterClass": "@AfterAll",
+            "@Ignore": "@Disable"
         }
         self.imports = {
             "org.junit.After": "org.junit.jupiter.api.AfterEach",
@@ -23,14 +23,23 @@ class JunitMigrationListener(JavaParserListener):
             "org.junit.AfterClass": "org.junit.jupiter.api.AfterAll",
             "org.junit.BeforeClass": "org.junit.jupiter.api.BeforeAll",
             "org.junit.Ignore": "org.junit.jupiter.api.Disable",
-            "org.junit.Test": "org.junit.jupiter.api.Test"
+            "org.junit.Test": "org.junit.jupiter.api.Test",
+            "org.junit.Assert.assertEquals": "org.junit.jupiter.api.Assertions.assertEquals"
         }
 
     def enterAnnotation(self, ctx: JavaParser.AnnotationContext):
-        annotation = ctx.getText()
-        if annotation in self.annotations:
-            self.rewriter.deleteToken(ctx.stop)
-            self.rewriter.insertAfter(ctx.start.tokenIndex, self.annotations[annotation])
+        annot = ctx.getText()
+        if annot.startswith("@Test"):
+            for c in ctx.children:
+                    pair = c.getText().split("=")
+                    if pair:
+                        if pair[0] == "timeout":
+                            self.rewriter.insertBeforeToken(ctx.start, f"@Timeout({pair[1]})\n")
+                            self.rewriter.replaceRangeTokens(ctx.start, ctx.stop, "\t@Test")
+                        elif pair[0] == "expected":
+                            pass
+        elif annot in self.annotations:
+            self.rewriter.replaceRangeTokens(ctx.start, ctx.stop, self.annotations[annot])
     
     def enterImportDeclaration(self, ctx: JavaParser.ImportDeclarationContext):
         for c in ctx.children:

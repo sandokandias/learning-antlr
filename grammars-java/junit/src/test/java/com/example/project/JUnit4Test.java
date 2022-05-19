@@ -52,7 +52,7 @@ public class JUnit4Test {
 		assertEquals(3, calculator.add(1, 2));
 	}
 
-	@Test(timeout = 1L)
+	@Test(timeout = 1)
 	public void testThreePlusFour() {
 		assertEquals(7, calculator.add(3, 4));
 	}
