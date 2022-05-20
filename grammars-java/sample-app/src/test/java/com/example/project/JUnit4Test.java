@@ -59,7 +59,7 @@ public class JUnit4Test {
 
 	@Test(expected = ArithmeticException.class)
 	public void testZeroDivision() {
-		calculator.divide(0, 1);
+		calculator.divide(1, 0);
 	}
 
 	@Ignore

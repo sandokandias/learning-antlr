@@ -14,6 +14,7 @@ class JunitMigrationListener(JavaParserListener):
         self.annotation_to_lambda = {
             "expected": ""
         }
+
     def enterAnnotation(self, ctx: JavaParser.AnnotationContext):
         annot = ctx.getText()
         if annot.startswith("@Test"):
@@ -21,10 +22,11 @@ class JunitMigrationListener(JavaParserListener):
                     pair = c.getText().split("=")
                     if pair:
                         if pair[0] == "timeout":
-                            self.rewriter.insertBeforeToken(ctx.start, f"@Timeout({pair[1]})\n")
+                            self.rewriter.insertAfterToken(ctx.stop, f"\n\t@Timeout({pair[1]})")
                         elif pair[0] == "expected":
                             self.annotation_to_lambda["expected"] = pair[1]
                         self.rewriter.replaceRangeTokens(ctx.start, ctx.stop, "@Test")
+
         elif annot in junit.annotations:
             self.rewriter.replaceRangeTokens(ctx.start, ctx.stop, junit.annotations[annot])
     
