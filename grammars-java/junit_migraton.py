@@ -11,8 +11,9 @@ class JunitMigrationListener(JavaParserListener):
 
     def __init__(self, rewriter: TokenStreamRewriter):
         self.rewriter = rewriter
-        
-
+        self.annotation_to_lambda = {
+            "expected": ""
+        }
     def enterAnnotation(self, ctx: JavaParser.AnnotationContext):
         annot = ctx.getText()
         if annot.startswith("@Test"):
@@ -21,9 +22,9 @@ class JunitMigrationListener(JavaParserListener):
                     if pair:
                         if pair[0] == "timeout":
                             self.rewriter.insertBeforeToken(ctx.start, f"@Timeout({pair[1]})\n")
-                            self.rewriter.replaceRangeTokens(ctx.start, ctx.stop, "\t@Test")
                         elif pair[0] == "expected":
-                            pass
+                            self.annotation_to_lambda["expected"] = pair[1]
+                        self.rewriter.replaceRangeTokens(ctx.start, ctx.stop, "@Test")
         elif annot in junit.annotations:
             self.rewriter.replaceRangeTokens(ctx.start, ctx.stop, junit.annotations[annot])
     
@@ -34,7 +35,14 @@ class JunitMigrationListener(JavaParserListener):
                 self.rewriter.replaceRangeTokens(c.start, c.stop, junit.imports[imp])
     
     def enterMethodBody(self, ctx: JavaParser.MethodBodyContext):
-        pass
+        if self.annotation_to_lambda["expected"]:
+            expected_except = self.annotation_to_lambda["expected"]
+            start_lambda = junit.expected_lambda[1].replace("@exception", expected_except)
+            end_lambda = junit.expected_lambda[2]
+            self.rewriter.insertAfter(ctx.start.tokenIndex + 1, "\t")
+            self.rewriter.insertAfterToken(ctx.start, start_lambda)
+            self.rewriter.insertBeforeToken(ctx.stop, end_lambda)
+            self.annotation_to_lambda["expected"] = ""
 
 
 def __parse(code):

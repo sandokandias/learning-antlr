@@ -3,7 +3,7 @@ annotations = {
     "@After": "@AfterEach",
     "@BeforeClass": "@BeforeAll",
     "@AfterClass": "@AfterAll",
-    "@Ignore": "@Disable"
+    "@Ignore": "@Disabled"
 }
 
 imports = {
@@ -11,7 +11,9 @@ imports = {
     "org.junit.Before": "org.junit.jupiter.api.BeforeEach",
     "org.junit.AfterClass": "org.junit.jupiter.api.AfterAll",
     "org.junit.BeforeClass": "org.junit.jupiter.api.BeforeAll",
-    "org.junit.Ignore": "org.junit.jupiter.api.Disable",
+    "org.junit.Ignore": "org.junit.jupiter.api.Disabled",
     "org.junit.Test": "org.junit.jupiter.api.Test",
     "org.junit.Assert.assertEquals": "org.junit.jupiter.api.Assertions.assertEquals"
 }
+
+expected_lambda = ("import static org.junit.jupiter.api.Assertions.assertThrows;","\n\t\tassertThrows(@exception, () -> {", "\t});\n\t")
