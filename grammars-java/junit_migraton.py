@@ -1,4 +1,5 @@
 from asyncore import readwrite
+from math import remainder
 import antlr4
 from antlr4 import ParseTreeWalker
 from antlr4.TokenStreamRewriter import TokenStreamRewriter
@@ -14,6 +15,10 @@ class JunitMigrationListener(JavaParserListener):
         self.annotation_to_lambda = {
             "expected": ""
         }
+        self.remaining_imports = {
+            "expected": "",
+            "timeout": ""
+        }
 
     def enterAnnotation(self, ctx: JavaParser.AnnotationContext):
         annot = ctx.getText()
@@ -22,9 +27,11 @@ class JunitMigrationListener(JavaParserListener):
                     pair = c.getText().split("=")
                     if pair:
                         if pair[0] == "timeout":
+                            self.remaining_imports["timeout"] = junit.imports["timeout"]
                             self.rewriter.insertAfterToken(ctx.stop, f"\n\t@Timeout({pair[1]})")
                         elif pair[0] == "expected":
                             self.annotation_to_lambda["expected"] = pair[1]
+                            self.remaining_imports["expected"] = junit.imports["expected"]
                         self.rewriter.replaceRangeTokens(ctx.start, ctx.stop, "@Test")
 
         elif annot in junit.annotations:
@@ -46,6 +53,23 @@ class JunitMigrationListener(JavaParserListener):
             self.rewriter.insertBeforeToken(ctx.stop, end_lambda)
             self.annotation_to_lambda["expected"] = ""
 
+class JunitReminderImportsListener(JavaParserListener):
+
+    def __init__(self, rewriter: TokenStreamRewriter, remaining_imports: dict):
+        self.rewriter = rewriter
+        self.remaining_imports = remaining_imports
+        self.added_imports = {
+            "expected": False,
+            "timeout": False
+        }
+
+    def enterImportDeclaration(self, ctx: JavaParser.ImportDeclarationContext):
+        for imp in self.remaining_imports:
+            if not self.added_imports[imp]:
+                self.rewriter.insertAfterToken(ctx.stop, "\n" + self.remaining_imports[imp])
+                self.added_imports[imp] = True
+                break
+
 
 def __parse(code):
     lexer = JavaLexer(antlr4.InputStream(code))
@@ -57,9 +81,11 @@ def main():
     code = open("./sample-app/src/test/java/com/example/project/JUnit4Test.java", "r").read()
     tokens, tree = __parse(code)
     rewriter = TokenStreamRewriter(tokens)    
-    listener = JunitMigrationListener(rewriter)
-    ParseTreeWalker().walk(listener, tree)
-    newcode = listener.rewriter.getDefaultText()
+    migration_listener = JunitMigrationListener(rewriter)
+    ParseTreeWalker().walk(migration_listener, tree)
+    remainder_imports_listener = JunitReminderImportsListener(rewriter, migration_listener.remaining_imports)
+    ParseTreeWalker().walk(remainder_imports_listener, tree)
+    newcode = remainder_imports_listener.rewriter.getDefaultText()
     print(newcode)
     __parse(newcode)
 
