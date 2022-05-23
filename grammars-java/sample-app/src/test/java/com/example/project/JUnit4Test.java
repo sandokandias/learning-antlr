@@ -7,68 +7,64 @@
  *
  * http://www.eclipse.org/legal/epl-v20.html
  */
+
 package com.example.project;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
 import static java.lang.System.out;
-import org.junit.jupiter.api.Timeout;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class JUnit4Test {
 
-        private Calculator calculator;
-        private Long startTime;
+	private Calculator calculator;
+	private Long startTime;
 
-        @BeforeAll
-        public static void beforeClass() {
-                out.println("Test suite start.");
-        }
+	@BeforeClass
+	public static void beforeClass() {
+		out.println("Test suite start.");
+	}
 
-        @AfterAll
-        public static void afterClass() {
-                out.println("Test suite end.");
-        }
+	@AfterClass
+	public static void afterClass() {
+		out.println("Test suite end.");
+	}
 
-        @BeforeEach
-        public void before() {
-                calculator = new Calculator();
-                startTime = System.currentTimeMillis();
-        }
+	@Before
+	public void before() {
+		calculator = new Calculator();
+		startTime = System.currentTimeMillis();
+	}
 
-        @AfterEach
-        public void after() {
-                Long endTime = System.currentTimeMillis() - startTime;
-                out.println("Test time (ms):" + endTime);
-        }
+	@After
+	public void after() {
+		Long endTime = System.currentTimeMillis() - startTime;
+		out.println("Test time (ms):" + endTime);
+	}
 
-        @Test
-        public void testOnePlusTwo() {
-                assertEquals(3, calculator.add(1, 2));
-        }
+	@Test
+	public void testOnePlusTwo() {
+		assertEquals(3, calculator.add(1, 2));
+	}
 
-        @Test
-        @Timeout(1)
-        public void testThreePlusFour() {
-                assertEquals(7, calculator.add(3, 4));
-        }
+	@Test(timeout = 1)
+	public void testThreePlusFour() {
+		assertEquals(7, calculator.add(3, 4));
+	}
 
-        @Test
-        public void testZeroDivision() {
-                assertThrows(ArithmeticException.class, () -> {
-                        calculator.divide(1, 0);
-                });
-        }
+	@Test(expected = ArithmeticException.class)
+	public void testZeroDivision() {
+		calculator.divide(1, 0);
+	}
 
-        @Disabled
-        @Test
-        public void testIgnore() {
-                assertEquals(0, calculator.add(0, 0));
-        }
+	@Ignore
+	@Test
+	public void testIgnore() {
+		assertEquals(0, calculator.add(0, 0));
+	}
 }
