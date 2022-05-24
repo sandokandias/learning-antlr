@@ -1,0 +1,6 @@
+#!/bin/sh
+
+echo "migrating JUnit 4 to 5..."
+python3 junit_migraton.py $1 > "$1/migration.out"
+echo "Done."
+echo "Check if the $1/migration.out file is correct."
