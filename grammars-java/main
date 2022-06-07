@@ -1,6 +1,7 @@
 #!/bin/sh
 
+PRJ="/Users/sandokandiasarantes/Github/sandokandias/antlr-poc/grammars-java/sample-app"
 echo "migrating JUnit 4 to 5..."
-python3 junit_migraton.py $1 > "$1/migration.out"
+python3 junit_migraton.py $PRJ > "$PRJ/migration.out"
 echo "Done."
-echo "Check if the $1/migration.out file is correct."
+echo "Check if the $PRJ/migration.out file is correct."
